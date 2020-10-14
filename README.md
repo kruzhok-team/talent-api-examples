@@ -38,4 +38,4 @@ poetry run python ./examples/authorization_code_flow.py
 ```
 
 ## @todo
-* Описать `Athorization Code Flow with PKCE`, когда фронт научиться пробрасывать `code_challenge` и `code_challenge_method`, а на беке появится авторизация по JWT
+* дописать валидацию JWT id_token, когда появится ручка с публичными ключами
