@@ -1,3 +1,4 @@
+.env
 .pyc
 .coverage
 .mypy_cache
