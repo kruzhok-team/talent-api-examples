@@ -126,7 +126,14 @@ user = client.get(USER_ENDPOINT).json()
 
 # get teams
 teams = client.get(USER_TEAMS_ENDPOINT).json()
-teams = [o[1] for o in teams['teams'].items()] + [o[1] for o in teams['memberships'].items()]
+
+# filter by accepted flag
+teams = list(
+            filter(
+                lambda ut: ut['user_accept'] is 'accepted' and ut['owner_accept'] is 'accepted',
+                [o[1] for o in teams['memberships'].items()]
+            )
+        ) + [o[1] for o in teams['teams'].items()]
 print('User teams:')
 pprint(teams)
 
