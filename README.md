@@ -16,6 +16,7 @@
 | `client_credential.py` | Client Credential Flow (используется для Server-to-Server авторизации)|
 | `authorization_code_flow.py` | Authorization Code Flow, самый распространенный сценарий с подтверждением доступа от пользователя |
 | `authorization_code_flow_with_pkce.py` | Authorization Code with PKCE, расширение ACF c дополнительной защитой, используется для авторизации SPA и мобильных приложений, в примере так же добавлен запрос `openid` скоупа |
+| `store_score.py` | Пример интеграции с «ОНТИ»: сохрание баллов для пользователей и команд «ОНТИ» с внешних платформ |
 
 ## Установка
 ```bash
