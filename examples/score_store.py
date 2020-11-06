@@ -26,18 +26,24 @@ USER_TEAMS_ENDPOINT = 'https://reg.nti-contest.ru/api/user_team_info'
 LIST_ACTIVITY_ENDPOINT = 'https://reg.nti-contest.ru/api/activity'
 USER_ACTIVITY_ENDPOINT = 'https://reg.nti-contest.ru/api/user_external_activity'
 TEAM_ACTIVITY_ENDPOINT = 'https://reg.nti-contest.ru/api/team_external_activity'
+AVAILABLE_ERROR_RESPONSE = [
+    'wrong_code',
+    'user_not_in_team',
+    'external_activity_not_found',
+    'no_score_passed',
+    'db_transaction_failed'
+]
 
 def _store_score(endpoint, payload):
     """
     Helper with logic of update for store score result for eny object
     """
-
     ext_activity = client.post(endpoint, json=payload)
 
-
     # if progress by current object and activity is exist, then - update
-    if ext_activity.status_code == 542:
-        pprint(ext_activity.json())
+    if ext_activity.status_code != 201:
+        if ext_activity.json().get('error', None) in AVAILABLE_ERROR_RESPONSE:
+            pprint(ext_activity.json())
 
         ext_activity = list(
             filter(
@@ -112,7 +118,6 @@ token = client.fetch_token(
 print('Your token:')
 pprint(token)
 
-
 # Step 3: create api request
 client = OAuth2Session(CLIENT_ID, CLIENT_SECRET, token=token)
 
@@ -130,7 +135,7 @@ teams = client.get(USER_TEAMS_ENDPOINT).json()
 # filter by accepted flag
 teams = list(
             filter(
-                lambda ut: ut['user_accept'] is 'accepted' and ut['owner_accept'] is 'accepted',
+                lambda ut: ut['user_accept'] == 'accepted' and ut['owner_accept'] == 'accepted',
                 [o[1] for o in teams['memberships'].items()]
             )
         ) + [o[1] for o in teams['teams'].items()]
@@ -162,8 +167,6 @@ except IndexError:
 user_activity = store_user_score(user['id'], own_activity['id'], score=99)
 print('User activity progress:')
 pprint(user_activity.json())
-
-
 
 # get random team for save score
 team = teams[random.randint(0, len(teams)-1)]
