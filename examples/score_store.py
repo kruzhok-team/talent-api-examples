@@ -53,7 +53,8 @@ def _store_score(endpoint, payload):
         )
         if not ext_activity:
             raise Exception(
-                f"ExternalActivity for current object and activity {payload['activity_id']} not found"
+                f"ExternalActivity for current object"
+                 "and activity {payload['activity_id']} not found"
             )
 
         ext_activity = client.put(
@@ -101,8 +102,15 @@ def store_team_score(team_id, activity_id, score):
 #####################
 
 # Step 1: get authrization url
-client = OAuth2Session(CLIENT_ID, CLIENT_SECRET, token_endpoint_auth_method='client_secret_post')
-uri, state = client.create_authorization_url(AUTHORIZATION_ENDPOINT, redirect_uri=REDIRECT_URI)
+client = OAuth2Session(
+    CLIENT_ID,
+    CLIENT_SECRET,
+    token_endpoint_auth_method='client_secret_post'
+)
+uri, state = client.create_authorization_url(
+    AUTHORIZATION_ENDPOINT, 
+    redirect_uri=REDIRECT_URI
+)
 
 # request redirect url from user
 authorization_response = input(
@@ -130,17 +138,20 @@ client = OAuth2Session(CLIENT_ID, CLIENT_SECRET, token=token)
 user = client.get(USER_ENDPOINT).json()
 
 # get teams
-teams = client.get(USER_TEAMS_ENDPOINT).json()
+teams_response = client.get(USER_TEAMS_ENDPOINT).json()
 
 # filter by accepted flag
-teams = list(
+user_teams = list(
             filter(
-                lambda ut: ut['user_accept'] == 'accepted' and ut['owner_accept'] == 'accepted',
-                [o[1] for o in teams['memberships'].items()]
+                lambda ut: (
+                    ut['user_accept'] == 'accepted' 
+                    and ut['owner_accept'] == 'accepted'
+                ),
+                [o[1] for o in teams_response['memberships'].items()]
             )
-        ) + [o[1] for o in teams['teams'].items()]
+        ) + [o[1] for o in teams_response['teams'].items()]
 print('User teams:')
-pprint(teams)
+pprint(user_teams)
 
 # find my platform activity from user activities:
 # - get all activity by every user profile
@@ -169,7 +180,7 @@ print('User activity progress:')
 pprint(user_activity.json())
 
 # get random team for save score
-team = teams[random.randint(0, len(teams)-1)]
+team = user_teams[random.randint(0, len(user_teams)-1)]
 if not team:
     raise Exception('Teams for user not found')
 
